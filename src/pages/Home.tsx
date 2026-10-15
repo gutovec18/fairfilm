@@ -177,7 +177,6 @@ function Showreel() {
   const ref = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] })
   const scale = useTransform(scrollYProgress, [0, 1], [0.84, 1])
-  const radius = useTransform(scrollYProgress, [0, 1], [40, 4])
 
   return (
     <section ref={ref} className={s.showreel} id="showreel">
@@ -187,7 +186,7 @@ function Showreel() {
           title={'Filmy, reklamy\n& *dokumenty*'}
           intro={<p>Natáčíme pro BBC, Discovery Channel, National Geographic i Českou televizi. Stejnou kvalitu přinášíme i značkám a firmám.</p>}
         />
-        <m.div style={{ scale, borderRadius: radius }} className={s.reelWrap}>
+        <m.div style={{ scale }} className={s.reelWrap}>
           <VideoPlayer
             src={site.reelUrl}
             poster={media('video/reel-poster.webp')}

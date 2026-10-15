@@ -6,8 +6,25 @@ import { IntroContext } from './components/IntroContext'
 import { Cursor, Intro, Shutter } from './components/layout/Effects'
 import { Footer } from './components/layout/Footer'
 import { Header } from './components/layout/Header'
-import { session } from './lib'
+import { afterLoadIdle, session } from './lib'
 import { Home } from './pages/Home'
+
+// Page chunks: loaded lazily, but prefetched during idle time after first load so navigation is instant.
+const pages = {
+  Academy: () => import('./pages/Academy'),
+  AiArt: () => import('./pages/AiArt'),
+  Commercials: () => import('./pages/Commercials'),
+  Contact: () => import('./pages/Contact'),
+  Corporate: () => import('./pages/Corporate'),
+  FilmCrew: () => import('./pages/FilmCrew'),
+  NotFound: () => import('./pages/NotFound'),
+  Production: () => import('./pages/Production'),
+  SoundCrew: () => import('./pages/SoundCrew'),
+  Studio: () => import('./pages/Studio'),
+  TvCrew: () => import('./pages/TvCrew'),
+  VideoProduction: () => import('./pages/VideoProduction'),
+}
+const prefetchPages = () => Object.values(pages).forEach((load) => void load().catch(() => {}))
 
 const Academy = lazy(() => import('./pages/Academy').then((m) => ({ default: m.Academy })))
 const AiArt = lazy(() => import('./pages/AiArt').then((m) => ({ default: m.AiArt })))
@@ -62,6 +79,10 @@ export default function App() {
   useEffect(() => {
     document.title = titles[location.pathname] ?? 'Fairfilm'
   }, [location.pathname])
+
+  useEffect(() => {
+    void afterLoadIdle(4000).then(prefetchPages)
+  }, [])
 
   return (
     <LazyMotion features={loadMotionFeatures} strict>

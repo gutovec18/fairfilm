@@ -196,9 +196,42 @@ function Prewarm() {
   return null
 }
 
+/**
+ * Adaptive quality: if this machine can't hold ~45 fps with the full setup, first drop the pixel ratio,
+ * then switch off the soft shadows. Steps down once each, never back up (no oscillation).
+ */
+function QualityGuard() {
+  const { gl, scene, setDpr } = useThree()
+  const samples = useRef<number[]>([])
+  const level = useRef(0)
+  useFrame((_, dt) => {
+    if (level.current >= 2) return
+    const s = samples.current
+    s.push(dt)
+    if (s.length < 60) return
+    s.sort((a, b) => a - b)
+    const median = s[30]
+    samples.current = []
+    if (median < 1 / 45) return
+    level.current++
+    if (level.current === 1) setDpr(1)
+    else {
+      gl.shadowMap.enabled = false
+      scene.traverse((o) => {
+        const light = o as THREE.Light
+        if (light.isLight) light.castShadow = false
+        const mesh = o as THREE.Mesh
+        if (mesh.isMesh) ([] as THREE.Material[]).concat(mesh.material).forEach((m) => (m.needsUpdate = true))
+      })
+    }
+  })
+  return null
+}
+
 function Scene({ progress }: { progress: MotionValue<number> }) {
   return (
     <>
+      <QualityGuard />
       <StudioEnvironment />
       <ambientLight intensity={0.2} />
       <spotLight
