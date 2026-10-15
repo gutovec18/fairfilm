@@ -1,9 +1,10 @@
-import { m, useInView, useMotionValue, useScroll, useSpring, useTransform } from 'motion/react'
+import { m, useMotionValue, useScroll, useSpring, useTransform } from 'motion/react'
 import { ArrowUpRight } from 'lucide-react'
 import { Component, lazy, startTransition, Suspense, useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Deferred } from '../components/Deferred'
 import { useIntroDone } from '../components/IntroContext'
+import { useAfterHero } from '../hooks/useAfterHero'
 import { useVideoInView } from '../hooks/useVideoInView'
 import { Button } from '../components/ui/Button'
 import { CTA } from '../components/ui/CTA'
@@ -13,11 +14,12 @@ import { SectionHead } from '../components/ui/SectionHead'
 import { SplitText } from '../components/ui/SplitText'
 import { VideoPlayer } from '../components/ui/VideoPlayer'
 import { process, productionLinks, site } from '../data/site'
-import { EASE_OUT, afterLoadIdle, cx, media } from '../lib'
+import { EASE_OUT, cx, media, quiet } from '../lib'
 import s from './Home.module.scss'
 
 // three.js is heavy: load the 3D showcase in its own chunk
-const CameraShowcase = lazy(() => import('../components/three/CameraShowcase'))
+const loadShowcase = () => import('../components/three/CameraShowcase')
+const CameraShowcase = lazy(loadShowcase)
 
 /** If the 3D chunk fails to load (offline, blocked), skip the section instead of crashing the page. */
 class SkipOnError extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -39,14 +41,14 @@ export function Home() {
         <DeferredShowcase />
         <Showreel />
       </Deferred>
-      <Deferred order={1}>
+      <Deferred order={2}>
         <Process />
         <Services />
       </Deferred>
-      <Deferred order={2}>
+      <Deferred order={3}>
         <Clients />
       </Deferred>
-      <Deferred order={3}>
+      <Deferred order={4}>
         <Divisions />
         <CTA />
       </Deferred>
@@ -59,28 +61,46 @@ export function Home() {
  * or straight away if the visitor scrolls close to it first. Keeps the first load spike-free.
  */
 function DeferredShowcase() {
-  const ready = useIntroDone()
-  const placeholder = useRef<HTMLDivElement>(null)
-  const near = useInView(placeholder, { margin: '0px 0px 60% 0px', once: true })
-  const [idle, setIdle] = useState(false)
+  // The 3D chunk is the heaviest thing on the site. It sits right below the hero, so it boots first, and every
+  // heavy step (evaluate three.js, mount the scene, warm up the GPU) waits for a quiet moment when the visitor
+  // isn't scrolling. Until then the section shows a still of the camera, so scrolling never stutters.
+  const after = useAfterHero(1, { eager: false })
+  const [boot, setBoot] = useState(false)
   useEffect(() => {
-    if (!ready) return
+    if (!after) return
     let alive = true
-    void afterLoadIdle().then(() => alive && startTransition(() => setIdle(true)))
+    const calm = { calmMs: 400, maxWaitMs: Number.POSITIVE_INFINITY }
+    void quiet(calm)
+      .then(() => loadShowcase())
+      .then(() => quiet(calm))
+      .then(() => alive && startTransition(() => setBoot(true)))
     return () => {
       alive = false
     }
-  }, [ready])
+  }, [after])
 
-  if (!idle && !near) return <div ref={placeholder} className={s.showcasePlaceholder} />
+  const poster = <ShowcasePlaceholder />
+  if (!boot) return poster
   return (
     <SkipOnError>
-      <Suspense fallback={<div className={s.showcasePlaceholder} />}>
+      <Suspense fallback={poster}>
         <CameraShowcase />
       </Suspense>
     </SkipOnError>
   )
 }
+
+/** Same footprint as the 3D section, with a still of the camera: what visitors see until the 3D is ready. */
+function ShowcasePlaceholder() {
+  return (
+    <section className={s.showcasePlaceholder} aria-hidden>
+      <div className={s.showcaseSticky}>
+        <img src={media('img/camera-poster.webp')} alt="" decoding="async" />
+      </div>
+    </section>
+  )
+}
+
 
 /* ------------------------------------------------------------------ */
 
@@ -90,14 +110,7 @@ function Hero() {
   const video = useRef<HTMLVideoElement>(null)
   useVideoInView(video)
   // The poster is preloaded and paints instantly; the 2 MB loop only starts downloading once the page is idle.
-  const [loadVideo, setLoadVideo] = useState(false)
-  useEffect(() => {
-    let alive = true
-    void afterLoadIdle().then(() => alive && setLoadVideo(true))
-    return () => {
-      alive = false
-    }
-  }, [])
+  const loadVideo = useAfterHero(0, { eager: false })
   useEffect(() => {
     const v = video.current
     if (!loadVideo || !v) return

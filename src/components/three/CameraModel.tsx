@@ -20,6 +20,39 @@ export function CameraModel() {
   const { scene, tally, screen } = useMemo(() => {
     let tallyMesh: THREE.Mesh | undefined
     let screenMesh: THREE.Mesh | undefined
+    // Performance: every MeshPhysicalMaterial variant (clearcoat / anisotropy / iridescence) compiles its own
+    // heavy shader. Only the lens glass really needs it; everything else becomes a MeshStandardMaterial,
+    // so the whole rig needs a handful of small programs instead of many big ones.
+    const simplified = new Map<THREE.Material, THREE.Material>()
+    gltf.scene.traverse((o) => {
+      const mesh = o as THREE.Mesh
+      if (!mesh.isMesh) return
+      const src = mesh.material as THREE.Material
+      if ((src as THREE.MeshPhysicalMaterial).isMeshPhysicalMaterial && src.name !== 'glass') {
+        if (!simplified.has(src)) {
+          const p = src as THREE.MeshPhysicalMaterial
+          const std = new THREE.MeshStandardMaterial({
+            name: p.name,
+            color: p.color,
+            map: p.map,
+            roughness: p.roughness,
+            metalness: p.metalness,
+            roughnessMap: p.roughnessMap,
+            metalnessMap: p.metalnessMap,
+            normalMap: p.normalMap,
+            emissive: p.emissive,
+            emissiveIntensity: p.emissiveIntensity,
+            transparent: p.transparent,
+            opacity: p.opacity,
+            side: p.side,
+            depthWrite: p.depthWrite,
+            envMapIntensity: p.envMapIntensity,
+          })
+          simplified.set(src, std)
+        }
+        mesh.material = simplified.get(src)!
+      }
+    })
     gltf.scene.traverse((o) => {
       const mesh = o as THREE.Mesh
       if (!mesh.isMesh) return

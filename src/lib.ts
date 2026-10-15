@@ -43,3 +43,55 @@ export function afterLoadIdle(timeout = 2500): Promise<void> {
     else window.addEventListener('load', go, { once: true })
   })
 }
+
+type IdleDeadlineLike = { timeRemaining: () => number; didTimeout: boolean }
+
+// Last time the visitor did anything (scroll, wheel, touch, keys, mouse). Heavy one-off work waits for a pause.
+let lastActivity = 0
+if (typeof window !== 'undefined') {
+  const mark = () => (lastActivity = performance.now())
+  for (const e of ['scroll', 'wheel', 'touchstart', 'touchmove', 'keydown', 'pointermove', 'pointerdown'])
+    window.addEventListener(e, mark, { passive: true, capture: true })
+}
+
+/**
+ * Runs `cb` in a *quiet* moment: the browser is idle and the visitor hasn't scrolled, moved the mouse,
+ * touched or typed for `calmMs`. Use for unavoidable heavy chunks of work: nothing on screen is being
+ * driven by the main thread then (video and CSS animations run on the compositor), so nothing stutters.
+ * Falls back after `maxWaitMs`. Returns a cancel function.
+ */
+export function whenQuiet(cb: () => void, { calmMs = 500, maxWaitMs = 12000 } = {}): () => void {
+  const w = window as Window & {
+    requestIdleCallback?: (cb: (d: IdleDeadlineLike) => void, o?: { timeout: number }) => number
+    cancelIdleCallback?: (id: number) => void
+  }
+  const started = performance.now()
+  let cancelled = false
+  let id = 0
+  const ready = () => performance.now() - lastActivity >= calmMs || performance.now() - started > maxWaitMs
+  if (!w.requestIdleCallback) {
+    const poll = () => {
+      if (cancelled) return
+      if (ready()) cb()
+      else id = window.setTimeout(poll, 150)
+    }
+    id = window.setTimeout(poll, 150)
+    return () => {
+      cancelled = true
+      window.clearTimeout(id)
+    }
+  }
+  const tick = (d: IdleDeadlineLike) => {
+    if (cancelled) return
+    if (ready() && (d.timeRemaining() > 8 || d.didTimeout)) cb()
+    else id = w.requestIdleCallback!(tick, { timeout: 250 })
+  }
+  id = w.requestIdleCallback(tick, { timeout: 250 })
+  return () => {
+    cancelled = true
+    w.cancelIdleCallback?.(id)
+  }
+}
+
+/** Promise form of whenQuiet. */
+export const quiet = (opts?: { calmMs?: number; maxWaitMs?: number }) => new Promise<void>((r) => whenQuiet(r, opts))

@@ -29,10 +29,32 @@
 .canvas {
   position: absolute;
   inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease;
 
   canvas {
     display: block;
   }
+}
+
+.canvasOn {
+  opacity: 1;
+}
+
+// still of the camera, shown until the live 3D has warmed up
+.poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.posterHidden {
+  opacity: 0;
 }
 
 .fallback {

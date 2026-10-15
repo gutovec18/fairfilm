@@ -1,9 +1,9 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { m, useInView, useScroll, useTransform, type MotionValue } from 'motion/react'
-import { Component, Suspense, useEffect, useMemo, useRef, type ReactNode } from 'react'
+import { Component, createContext, Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import * as THREE from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
-import { cancelIdle, media, whenIdle } from '../../lib'
+import { cx, media, whenQuiet } from '../../lib'
 import { CameraModel } from './CameraModel'
 import s from './CameraShowcase.module.scss'
 
@@ -81,7 +81,7 @@ function Rig({ progress }: { progress: MotionValue<number> }) {
       <group position={[0, 0, -0.9]}>
         <Suspense fallback={null}>
           <CameraModel />
-          <Prewarm />
+          <WarmUp />
         </Suspense>
       </group>
     </group>
@@ -134,29 +134,6 @@ function Dust({ count = 420 }: { count?: number }) {
   )
 }
 
-/** Neutral studio reflections (three's RoomEnvironment, prefiltered once). */
-function StudioEnvironment() {
-  const { gl, scene } = useThree()
-  useEffect(() => {
-    let env: THREE.Texture | undefined
-    let pmrem: THREE.PMREMGenerator | undefined
-    // generated during idle time so it never competes with the first frames
-    const id = whenIdle(() => {
-      pmrem = new THREE.PMREMGenerator(gl)
-      env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
-      scene.environment = env
-      scene.environmentIntensity = 0.9
-    })
-    return () => {
-      cancelIdle(id)
-      scene.environment = null
-      env?.dispose()
-      pmrem?.dispose()
-    }
-  }, [gl, scene])
-  return null
-}
-
 /** Soft floor shadow: a blurred radial decal is plenty for a floating hero object. */
 function FloorShadow() {
   const tex = useMemo(() => {
@@ -182,17 +159,63 @@ function FloorShadow() {
  * Compile every shader (incl. shadow variants) and upload geometry/textures while the section is still
  * off screen, so the first visible frame doesn't hitch. Uses parallel compilation where supported.
  */
-function Prewarm() {
+/** Lets the off-screen warm-up tell the section when the live 3D may take over from the poster. */
+const WarmContext = createContext<() => void>(() => {})
+
+// While the 3D isn't ready the visitor sees a poster, so warm-up never needs to run during scrolling.
+const QUIET = { calmMs: 400, maxWaitMs: Number.POSITIVE_INFINITY }
+
+/**
+ * Off-screen warm-up, one step per quiet moment (visitor not scrolling / moving):
+ *   1. studio reflections (PMREM), first, so shaders don't have to be rebuilt for the env map later
+ *   2. shader compile + GPU upload, a few materials at a time
+ *   3. one full frame (shadow map etc.)
+ * Then the section swaps the poster for the live canvas.
+ */
+function WarmUp() {
   const { gl, scene, camera } = useThree()
+  const onWarm = useContext(WarmContext)
   useEffect(() => {
     let cancelled = false
-    void gl.compileAsync(scene, camera).then(() => {
-      if (!cancelled) gl.render(scene, camera)
+    let cancelNext = () => {}
+    let pmrem: THREE.PMREMGenerator | undefined
+    let envTex: THREE.Texture | undefined
+    const meshes: THREE.Mesh[] = []
+    scene.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) meshes.push(o as THREE.Mesh)
+    })
+    const materials = [...new Set(meshes.flatMap((m) => ([] as THREE.Material[]).concat(m.material)))]
+    const BATCH = 3
+    const next = (fn: () => void) => (cancelNext = whenQuiet(() => !cancelled && fn(), QUIET))
+
+    const batch = (i: number) => {
+      const set = new Set(materials.slice(i, i + BATCH))
+      const hidden = meshes.filter((m) => m.visible && !([] as THREE.Material[]).concat(m.material).some((x) => set.has(x)))
+      hidden.forEach((m) => (m.visible = false))
+      gl.render(scene, camera)
+      hidden.forEach((m) => (m.visible = true))
+      if (i + BATCH < materials.length) next(() => batch(i + BATCH))
+      else
+        next(() => {
+          gl.render(scene, camera)
+          onWarm()
+        })
+    }
+    next(() => {
+      pmrem = new THREE.PMREMGenerator(gl)
+      envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+      scene.environment = envTex
+      scene.environmentIntensity = 0.9
+      next(() => batch(0))
     })
     return () => {
       cancelled = true
+      cancelNext()
+      scene.environment = null
+      envTex?.dispose()
+      pmrem?.dispose()
     }
-  }, [gl, scene, camera])
+  }, [gl, scene, camera, onWarm])
   return null
 }
 
@@ -232,7 +255,6 @@ function Scene({ progress }: { progress: MotionValue<number> }) {
   return (
     <>
       <QualityGuard />
-      <StudioEnvironment />
       <ambientLight intensity={0.2} />
       <spotLight
         position={[4, 6, 7]}
@@ -293,6 +315,10 @@ export default function CameraShowcase() {
   const active = useInView(section, { margin: '20% 0px 20% 0px' })
   const { scrollYProgress } = useScroll({ target: section, offset: ['start start', 'end end'] })
 
+  // the live canvas only renders (and replaces the poster) once it is fully warmed up
+  const [warm, setWarm] = useState(false)
+  const onWarm = useCallback(() => setWarm(true), [])
+
   const bar = useTransform(scrollYProgress, [0.02, 0.9], [0, 1])
   const fade = useTransform(scrollYProgress, [0.9, 0.99], [0, 1])
 
@@ -300,17 +326,20 @@ export default function CameraShowcase() {
     <section ref={section} className={s.section} aria-label="Naše technika: 3D kamera">
       <div className={s.sticky}>
         <div className={s.glow} aria-hidden />
+        <ShowcasePosterImage hidden={warm} />
 
-        <div className={s.canvas}>
+        <div className={cx(s.canvas, warm && s.canvasOn)}>
           <GLBoundary fallback={<img className={s.fallback} src={media('img/stab-red.webp')} alt="Kamera RED Epic" />}>
             <Canvas
-              frameloop={active ? 'always' : 'never'}
+              frameloop={active && warm ? 'always' : 'never'}
               dpr={[1, 1.5]}
               camera={{ position: [0, 0.35, 9], fov: 30, near: 0.05, far: 60 }}
               shadows="soft"
               gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
             >
-              <Scene progress={scrollYProgress} />
+              <WarmContext.Provider value={onWarm}>
+                <Scene progress={scrollYProgress} />
+              </WarmContext.Provider>
             </Canvas>
           </GLBoundary>
         </div>
@@ -329,4 +358,9 @@ export default function CameraShowcase() {
       </div>
     </section>
   )
+}
+
+/** Still of the camera (rendered from the real model) shown until the live 3D is ready. */
+export function ShowcasePosterImage({ hidden = false }: { hidden?: boolean }) {
+  return <img className={cx(s.poster, hidden && s.posterHidden)} src={media('img/camera-poster.webp')} alt="" decoding="async" />
 }

@@ -6,7 +6,8 @@ import { IntroContext } from './components/IntroContext'
 import { Cursor, Intro, Shutter } from './components/layout/Effects'
 import { Footer } from './components/layout/Footer'
 import { Header } from './components/layout/Header'
-import { afterLoadIdle, session } from './lib'
+import { useAfterHero } from './hooks/useAfterHero'
+import { session } from './lib'
 import { Home } from './pages/Home'
 
 // Page chunks: loaded lazily, but prefetched during idle time after first load so navigation is instant.
@@ -25,6 +26,15 @@ const pages = {
   VideoProduction: () => import('./pages/VideoProduction'),
 }
 const prefetchPages = () => Object.values(pages).forEach((load) => void load().catch(() => {}))
+
+/** Prefetches the other pages in the very last idle slot, after the hero, sections, video and 3D. */
+function PrefetchPages() {
+  const go = useAfterHero(8, { eager: false })
+  useEffect(() => {
+    if (go) prefetchPages()
+  }, [go])
+  return null
+}
 
 const Academy = lazy(() => import('./pages/Academy').then((m) => ({ default: m.Academy })))
 const AiArt = lazy(() => import('./pages/AiArt').then((m) => ({ default: m.AiArt })))
@@ -80,15 +90,13 @@ export default function App() {
     document.title = titles[location.pathname] ?? 'Fairfilm'
   }, [location.pathname])
 
-  useEffect(() => {
-    void afterLoadIdle(4000).then(prefetchPages)
-  }, [])
 
   return (
     <LazyMotion features={loadMotionFeatures} strict>
     <MotionConfig reducedMotion="user">
       <IntroContext.Provider value={!intro}>
         <Header />
+        <PrefetchPages />
         <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo(0, 0)}>
           <m.div key={location.pathname}>
             <main>
@@ -110,7 +118,7 @@ export default function App() {
               </Routes>
               </Suspense>
             </main>
-            <Deferred order={4} minHeight="40vh">
+            <Deferred order={5} minHeight="40vh">
               <Footer />
             </Deferred>
             <Shutter skipEnter={location.key === firstKey} />

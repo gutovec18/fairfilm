@@ -18,8 +18,6 @@
     aspect-ratio: 4 / 5;
     object-fit: cover;
     border-radius: 6px;
-    filter: grayscale(1) contrast(1.05);
-    transition: filter 0.8s;
   }
 
   span {
@@ -34,11 +32,6 @@
     color: $paper;
   }
 
-  @include hover {
-    img {
-      filter: none;
-    }
-  }
 }
 
 .list {

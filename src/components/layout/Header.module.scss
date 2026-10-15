@@ -242,14 +242,21 @@
   video {
     @include cover;
     object-fit: cover;
-    filter: brightness(0.6);
-    transition:
-      transform 1.2s $ease-out,
-      filter 0.6s;
+    transition: transform 1.2s $ease-out;
+  }
+
+  // darkening as a tint layer: a filter on a playing video is re-applied to every video frame
+  &::before {
+    content: '';
+    @include cover;
+    z-index: 1;
+    background: linear-gradient(180deg, rgba($ink, 0.3), rgba($ink, 0.65));
+    transition: opacity 0.6s;
   }
 
   span {
     position: relative;
+    z-index: 2;
     font-family: $font-display;
     font-size: 1.8rem;
     font-weight: 700;
@@ -267,7 +274,9 @@
   @include hover {
     video {
       transform: scale(1.06);
-      filter: brightness(0.8);
+    }
+    &::before {
+      opacity: 0.6;
     }
   }
 }

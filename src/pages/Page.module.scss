@@ -418,12 +418,19 @@
 
   img {
     @include cover;
-    z-index: -2;
+    z-index: -3;
     object-fit: cover;
-    filter: grayscale(0.3) brightness(0.85);
-    transition:
-      transform 1.4s $ease-out,
-      filter 0.6s;
+    transition: transform 1.4s $ease-out;
+    will-change: transform;
+  }
+
+  // dimming tint (fades on hover) + bottom gradient for the label
+  &::before {
+    content: '';
+    @include cover;
+    z-index: -2;
+    background: rgba($ink, 0.18);
+    transition: opacity 0.6s $ease-out;
   }
 
   &::after {
@@ -444,7 +451,9 @@
   @include hover {
     img {
       transform: scale(1.08);
-      filter: none;
+    }
+    &::before {
+      opacity: 0;
     }
   }
 }

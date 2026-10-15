@@ -35,7 +35,10 @@
 .dot {
   display: grid;
   place-items: center;
-  translate: -50% -50%;
+  width: 92px;
+  height: 92px;
+  margin: -46px 0 0 -46px;
+  will-change: transform;
   border-radius: 50%;
   background: $brand;
   transition:
@@ -45,7 +48,7 @@
 
   &[data-mode='ring'] {
     background: transparent;
-    border-color: rgba($paper, 0.7);
+    border: 2px solid rgba($paper, 0.7); // drawn at 0.5 scale, so ~1px on screen
   }
 
   &[data-mode='label'] {

@@ -54,13 +54,14 @@ export function Cursor() {
   }, [x, y])
 
   if (!enabled) return null
-  const size = label ? 92 : hover ? 46 : 10
+  // fixed 92px circle, only scaled: transform-only, so the cursor never triggers layout
+  const size = label ? 1 : hover ? 0.5 : 0.11
   return (
     <m.div className={s.cursor} style={{ x: sx, y: sy }} aria-hidden>
       <m.div
         className={s.dot}
         data-mode={label ? 'label' : hover ? 'ring' : 'dot'}
-        animate={{ width: size, height: size, scale: down ? 0.85 : 1 }}
+        animate={{ scale: size * (down ? 0.85 : 1) }}
         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       >
         {label && (

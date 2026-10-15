@@ -25,7 +25,7 @@ export function CTA({
   return (
     <section ref={ref} className={s.cta}>
       <m.div className={s.bg} style={{ y }}>
-        <img src={media('img/hero-clouds.webp')} alt="" loading="lazy" decoding="async" />
+        <img src={media('img/cta-bg.webp')} alt="" loading="lazy" decoding="async" />
       </m.div>
       <div className={s.shade} />
 
