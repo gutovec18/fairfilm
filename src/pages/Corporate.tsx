@@ -97,7 +97,7 @@ export function Corporate() {
             {categories.map((c, i) => (
               <Reveal key={c.label} delay={(i % 4) * 0.06}>
                 <div className={s.imgCard}>
-                  <img src={media(c.img)} alt="" loading="lazy" decoding="async" />
+                  <img src={media(c.img.replace('img/', 'img/card/'))} alt="" loading="lazy" decoding="async" />
                   <span>{c.label}</span>
                 </div>
               </Reveal>

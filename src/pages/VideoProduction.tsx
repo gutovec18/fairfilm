@@ -74,7 +74,7 @@ export function VideoProduction() {
             {gallery.map((g, i) => (
               <Reveal key={g.label} delay={(i % 3) * 0.08}>
                 <div className={s.imgCard}>
-                  <img src={media(g.img)} alt="" loading="lazy" decoding="async" />
+                  <img src={media(g.img.replace('img/', 'img/card/'))} alt="" loading="lazy" decoding="async" />
                   <span>{g.label}</span>
                 </div>
               </Reveal>
