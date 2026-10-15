@@ -162,11 +162,11 @@ function FloorShadow() {
 /** Lets the off-screen warm-up tell the section when the live 3D may take over from the poster. */
 const WarmContext = createContext<() => void>(() => {})
 
-// While the 3D isn't ready the visitor sees a poster, so warm-up prefers pauses in scrolling, but never waits long.
-const QUIET = { calmMs: 200, maxWaitMs: 500 }
+// Each warm-up step gets its own idle slot (so steps never pile into one long frame), without waiting for the visitor.
+const QUIET = { calmMs: 0, maxWaitMs: 0 }
 
 /**
- * Off-screen warm-up, one step per quiet moment (visitor not scrolling), each wait bounded:
+ * Off-screen warm-up, one step per idle slot:
  *   1. studio reflections (PMREM), first, so shaders don't have to be rebuilt for the env map later
  *   2. all shaders compiled in the background (KHR_parallel_shader_compile) via compileAsync
  *   3. texture upload to the GPU

@@ -4,7 +4,6 @@ import { Component, lazy, startTransition, Suspense, useEffect, useRef, useState
 import { Link } from 'react-router-dom'
 import { Deferred } from '../components/Deferred'
 import { useIntroDone } from '../components/IntroContext'
-import { useAfterHero } from '../hooks/useAfterHero'
 import { useVideoInView } from '../hooks/useVideoInView'
 import { Button } from '../components/ui/Button'
 import { CTA } from '../components/ui/CTA'
@@ -14,7 +13,7 @@ import { SectionHead } from '../components/ui/SectionHead'
 import { SplitText } from '../components/ui/SplitText'
 import { VideoPlayer } from '../components/ui/VideoPlayer'
 import { process, productionLinks, site } from '../data/site'
-import { EASE_OUT, cx, media, quiet } from '../lib'
+import { EASE_OUT, cx, media } from '../lib'
 import s from './Home.module.scss'
 
 // three.js is heavy: load the 3D showcase in its own chunk
@@ -36,9 +35,9 @@ export function Home() {
   return (
     <>
       <Hero />
+      <DeferredShowcase />
       {/* below the fold: rendered after first paint, one section per idle slot */}
       <Deferred order={0}>
-        <DeferredShowcase />
         <Showreel />
       </Deferred>
       <Deferred order={2}>
@@ -57,27 +56,22 @@ export function Home() {
 }
 
 /**
- * Mounts the 3D section only once the page is loaded, the intro is over and the browser is idle,
- * or straight away if the visitor scrolls close to it first. Keeps the first load spike-free.
+ * The 3D section boots right away, in parallel with the hero, so it is live by the time the visitor gets
+ * there: the model download starts at once, three.js loads in its own chunk and the scene mounts on the
+ * next frame. Until it is warmed up the section shows a still of the camera.
  */
 function DeferredShowcase() {
-  // The 3D chunk is the heaviest thing on the site. It sits right below the hero, so it boots first, and every
-  // heavy step (evaluate three.js, mount the scene, warm up the GPU) prefers a pause in scrolling (bounded, so it
-  // never waits long). Until then the section shows a still of the camera.
-  const after = useAfterHero(1)
   const [boot, setBoot] = useState(false)
   useEffect(() => {
-    if (!after) return
     let alive = true
-    const calm = { calmMs: 250, maxWaitMs: 700 }
-    void quiet(calm)
-      .then(() => loadShowcase())
-      .then(() => quiet(calm))
-      .then(() => alive && startTransition(() => setBoot(true)))
+    const link = Object.assign(document.createElement('link'), { rel: 'preload', as: 'fetch', href: media('3d/camera.glb'), crossOrigin: 'anonymous' })
+    document.head.appendChild(link)
+    void loadShowcase().then(() => alive && startTransition(() => setBoot(true)))
     return () => {
       alive = false
+      link.remove()
     }
-  }, [after])
+  }, [])
 
   const poster = <ShowcasePlaceholder />
   if (!boot) return poster
