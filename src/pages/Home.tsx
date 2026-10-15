@@ -62,14 +62,14 @@ export function Home() {
  */
 function DeferredShowcase() {
   // The 3D chunk is the heaviest thing on the site. It sits right below the hero, so it boots first, and every
-  // heavy step (evaluate three.js, mount the scene, warm up the GPU) waits for a quiet moment when the visitor
-  // isn't scrolling. Until then the section shows a still of the camera, so scrolling never stutters.
-  const after = useAfterHero(1, { eager: false })
+  // heavy step (evaluate three.js, mount the scene, warm up the GPU) prefers a pause in scrolling (bounded, so it
+  // never waits long). Until then the section shows a still of the camera.
+  const after = useAfterHero(1)
   const [boot, setBoot] = useState(false)
   useEffect(() => {
     if (!after) return
     let alive = true
-    const calm = { calmMs: 400, maxWaitMs: Number.POSITIVE_INFINITY }
+    const calm = { calmMs: 250, maxWaitMs: 700 }
     void quiet(calm)
       .then(() => loadShowcase())
       .then(() => quiet(calm))
@@ -109,14 +109,6 @@ function Hero() {
   const ref = useRef<HTMLElement>(null)
   const video = useRef<HTMLVideoElement>(null)
   useVideoInView(video)
-  // The poster is preloaded and paints instantly; the 2 MB loop only starts downloading once the page is idle.
-  const loadVideo = useAfterHero(0, { eager: false })
-  useEffect(() => {
-    const v = video.current
-    if (!loadVideo || !v) return
-    v.load()
-    void v.play().catch(() => {})
-  }, [loadVideo])
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.18])
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '18%'])
@@ -132,10 +124,10 @@ function Hero() {
   return (
     <section ref={ref} className={s.hero}>
       <m.div className={s.heroMedia} style={{ scale, y }}>
-        <video ref={video} muted loop playsInline preload="none" poster={media('video/hero-poster.webp')}>
+        <video ref={video} autoPlay muted loop playsInline preload="auto" poster={media('video/hero-poster.webp')}>
           {/* MP4 first: Safari loops H.264 reliably, while its WebM looping is flaky */}
-          {loadVideo && <source src={media('video/hero.mp4')} type="video/mp4" />}
-          {loadVideo && <source src={media('video/hero.webm')} type="video/webm" />}
+          <source src={media('video/hero.mp4')} type="video/mp4" />
+          <source src={media('video/hero.webm')} type="video/webm" />
         </video>
       </m.div>
       <div className={s.heroShade} />

@@ -46,16 +46,17 @@ export function afterLoadIdle(timeout = 2500): Promise<void> {
 
 type IdleDeadlineLike = { timeRemaining: () => number; didTimeout: boolean }
 
-// Last time the visitor did anything (scroll, wheel, touch, keys, mouse). Heavy one-off work waits for a pause.
+// Last time the visitor scrolled, touched, clicked or typed. Heavy one-off work waits for a pause in that
+// (plain mouse movement doesn't count: visitors rarely hold the mouse still, and nothing scrolls then).
 let lastActivity = 0
 if (typeof window !== 'undefined') {
   const mark = () => (lastActivity = performance.now())
-  for (const e of ['scroll', 'wheel', 'touchstart', 'touchmove', 'keydown', 'pointermove', 'pointerdown'])
+  for (const e of ['scroll', 'wheel', 'touchstart', 'touchmove', 'keydown', 'pointerdown'])
     window.addEventListener(e, mark, { passive: true, capture: true })
 }
 
 /**
- * Runs `cb` in a *quiet* moment: the browser is idle and the visitor hasn't scrolled, moved the mouse,
+ * Runs `cb` in a *quiet* moment: the browser is idle and the visitor hasn't scrolled,
  * touched or typed for `calmMs`. Use for unavoidable heavy chunks of work: nothing on screen is being
  * driven by the main thread then (video and CSS animations run on the compositor), so nothing stutters.
  * Falls back after `maxWaitMs`. Returns a cancel function.

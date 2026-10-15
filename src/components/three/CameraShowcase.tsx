@@ -162,14 +162,15 @@ function FloorShadow() {
 /** Lets the off-screen warm-up tell the section when the live 3D may take over from the poster. */
 const WarmContext = createContext<() => void>(() => {})
 
-// While the 3D isn't ready the visitor sees a poster, so warm-up never needs to run during scrolling.
-const QUIET = { calmMs: 400, maxWaitMs: Number.POSITIVE_INFINITY }
+// While the 3D isn't ready the visitor sees a poster, so warm-up prefers pauses in scrolling, but never waits long.
+const QUIET = { calmMs: 200, maxWaitMs: 500 }
 
 /**
- * Off-screen warm-up, one step per quiet moment (visitor not scrolling / moving):
+ * Off-screen warm-up, one step per quiet moment (visitor not scrolling), each wait bounded:
  *   1. studio reflections (PMREM), first, so shaders don't have to be rebuilt for the env map later
- *   2. shader compile + GPU upload, a few materials at a time
- *   3. one full frame (shadow map etc.)
+ *   2. all shaders compiled in the background (KHR_parallel_shader_compile) via compileAsync
+ *   3. texture upload to the GPU
+ *   4. one full frame (shadow map etc.)
  * Then the section swaps the poster for the live canvas.
  */
 function WarmUp() {
@@ -180,33 +181,32 @@ function WarmUp() {
     let cancelNext = () => {}
     let pmrem: THREE.PMREMGenerator | undefined
     let envTex: THREE.Texture | undefined
-    const meshes: THREE.Mesh[] = []
-    scene.traverse((o) => {
-      if ((o as THREE.Mesh).isMesh) meshes.push(o as THREE.Mesh)
-    })
-    const materials = [...new Set(meshes.flatMap((m) => ([] as THREE.Material[]).concat(m.material)))]
-    const BATCH = 3
     const next = (fn: () => void) => (cancelNext = whenQuiet(() => !cancelled && fn(), QUIET))
-
-    const batch = (i: number) => {
-      const set = new Set(materials.slice(i, i + BATCH))
-      const hidden = meshes.filter((m) => m.visible && !([] as THREE.Material[]).concat(m.material).some((x) => set.has(x)))
-      hidden.forEach((m) => (m.visible = false))
-      gl.render(scene, camera)
-      hidden.forEach((m) => (m.visible = true))
-      if (i + BATCH < materials.length) next(() => batch(i + BATCH))
-      else
+    const finish = () =>
+      next(() => {
+        const textures = new Set<THREE.Texture>()
+        scene.traverse((o) => {
+          for (const m of ([] as THREE.Material[]).concat((o as THREE.Mesh).material ?? []))
+            for (const v of Object.values(m)) if ((v as THREE.Texture)?.isTexture) textures.add(v as THREE.Texture)
+        })
+        textures.forEach((t) => gl.initTexture(t))
         next(() => {
           gl.render(scene, camera)
           onWarm()
         })
-    }
+      })
+
     next(() => {
       pmrem = new THREE.PMREMGenerator(gl)
       envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
       scene.environment = envTex
       scene.environmentIntensity = 0.9
-      next(() => batch(0))
+      next(() => {
+        gl.compileAsync(scene, camera).then(
+          () => !cancelled && finish(),
+          () => !cancelled && finish(),
+        )
+      })
     })
     return () => {
       cancelled = true
