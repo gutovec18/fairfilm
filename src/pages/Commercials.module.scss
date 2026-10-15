@@ -1,0 +1,83 @@
+.channels {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+  @include up(md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include up(lg) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.channel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2.5rem;
+  min-height: 190px;
+  padding: 1.5rem;
+  border-radius: 18px;
+  border: 1px solid $line;
+  background: $ink-3;
+  transition:
+    background 0.5s,
+    color 0.5s,
+    transform 0.6s $ease-out;
+
+  svg {
+    color: $brand;
+    transition: color 0.5s;
+  }
+
+  span {
+    font-family: $font-display;
+    font-size: 1.45rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 1.05;
+  }
+
+  @include hover {
+    background: $brand;
+    color: $ink;
+    transform: translateY(-6px);
+
+    svg {
+      color: $ink;
+    }
+  }
+}
+
+.big {
+  @include display(clamp(2.6rem, 5.6vw, 5.4rem));
+}
+
+.priceBox {
+  display: grid;
+  gap: 1.2rem;
+  padding: clamp(1.6rem, 3vw, 2.6rem);
+  border-radius: 22px;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba($brand, 0.22), transparent 60%),
+    $ink-3;
+  border: 1px solid rgba($brand, 0.4);
+
+  svg {
+    color: $brand;
+  }
+
+  h3 {
+    font-family: $font-display;
+    font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  p {
+    color: rgba($paper, 0.72);
+  }
+}

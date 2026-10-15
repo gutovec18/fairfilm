@@ -1,0 +1,124 @@
+.section {
+  position: relative;
+  height: 520vh;
+  background: $ink;
+
+  @include down(md) {
+    height: 420vh;
+  }
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(45% 55% at 62% 45%, rgba($brand, 0.14), transparent 70%),
+    radial-gradient(60% 50% at 40% 60%, rgba(#9fb4ff, 0.05), transparent 70%);
+  pointer-events: none;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+
+  canvas {
+    display: block;
+  }
+}
+
+.fallback {
+  position: absolute;
+  inset: 20% 15%;
+  width: 70%;
+  height: 60%;
+  object-fit: contain;
+}
+
+.progress {
+  position: absolute;
+  left: 50%;
+  bottom: 2rem;
+  width: min(240px, 40vw);
+  height: 2px;
+  translate: -50% 0;
+  background: rgba($paper, 0.12);
+
+  i {
+    display: block;
+    height: 100%;
+    background: $brand;
+    transform-origin: left;
+  }
+}
+
+/* ---------------- Captions ---------------- */
+.captions {
+  position: absolute;
+  left: $gutter;
+  bottom: clamp(4.5rem, 12vh, 8rem);
+  width: min(30rem, calc(100% - 2 * #{$gutter}));
+  pointer-events: none;
+
+  @include up(lg) {
+    left: calc(#{$gutter} + 2.4rem);
+    bottom: auto;
+    top: 50%;
+    translate: 0 -50%;
+  }
+}
+
+.caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  @include up(lg) {
+    bottom: auto;
+    top: 0;
+    translate: 0 -50%;
+  }
+
+  h3 {
+    @include display(clamp(2.6rem, 6vw, 5.6rem));
+    margin: 0.8rem 0 1rem;
+    text-shadow: 0 10px 40px rgba($ink, 0.8);
+  }
+
+  p {
+    max-width: 24rem;
+    color: rgba($paper, 0.75);
+    font-size: 1rem;
+    text-shadow: 0 2px 20px rgba($ink, 0.9);
+  }
+}
+
+.capIdx {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  @include eyebrow;
+  color: $brand;
+
+  i {
+    width: 2rem;
+    height: 1px;
+    background: currentColor;
+  }
+}
+
+.fade {
+  position: absolute;
+  inset: 0;
+  background: $ink;
+  pointer-events: none;
+}

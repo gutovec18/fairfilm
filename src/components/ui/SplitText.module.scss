@@ -1,0 +1,30 @@
+.root {
+  margin: 0;
+}
+
+.line {
+  display: block;
+}
+
+.mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  // room for descenders & diacritics (Č, Ř, Ů) without clipping
+  padding-block: 0.08em;
+  margin-block: -0.08em;
+
+  &:not(:last-child) {
+    margin-right: 0.22em;
+  }
+}
+
+.word {
+  display: inline-block;
+  transform-origin: left bottom;
+  will-change: transform;
+}
+
+.accent {
+  color: $brand;
+}

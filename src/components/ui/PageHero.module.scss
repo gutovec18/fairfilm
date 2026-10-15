@@ -1,0 +1,81 @@
+.hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background: $ink;
+  isolation: isolate;
+}
+
+.tall {
+  min-height: 88svh;
+}
+
+.compact {
+  min-height: 62svh;
+}
+
+.media {
+  @include cover;
+  z-index: -2;
+
+  img,
+  video {
+    @include cover;
+    object-fit: cover;
+  }
+}
+
+.shade {
+  @include cover;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba($ink, 0.7) 0%, rgba($ink, 0.15) 35%, rgba($ink, 0.55) 70%, $ink 100%),
+    linear-gradient(90deg, rgba($ink, 0.75), transparent 70%);
+}
+
+.inner {
+  @include container;
+  padding-top: calc($header-h + 4rem);
+  padding-bottom: clamp(4rem, 9vw, 7rem);
+}
+
+.crumbs {
+  @include eyebrow;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.8rem;
+  color: rgba($paper, 0.6);
+
+  a {
+    transition: color 0.3s;
+    @include hover {
+      color: $brand;
+    }
+  }
+
+  i {
+    font-style: normal;
+    margin-right: 0.6rem;
+    color: $brand;
+  }
+
+  b {
+    font-weight: 500;
+    color: $paper;
+  }
+}
+
+.title {
+  @include display(clamp(3.4rem, 11vw, 11rem));
+  max-width: 14ch;
+}
+
+.lead {
+  max-width: 40rem;
+  margin-top: 2rem;
+  font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+  line-height: 1.6;
+  color: rgba($paper, 0.78);
+}

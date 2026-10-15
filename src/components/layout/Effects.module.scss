@@ -1,0 +1,172 @@
+@keyframes sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.86;
+  }
+  50% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.92;
+  }
+}
+
+// ---------- Cursor ----------
+.cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.dot {
+  display: grid;
+  place-items: center;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: $brand;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+  border: 1px solid transparent;
+
+  &[data-mode='ring'] {
+    background: transparent;
+    border-color: rgba($paper, 0.7);
+  }
+
+  &[data-mode='label'] {
+    background: $brand;
+  }
+
+  span {
+    font-family: $font-mono;
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: $ink;
+    white-space: nowrap;
+  }
+}
+
+// ---------- Page transition ----------
+.shutter {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: $ink-2;
+  pointer-events: none;
+}
+
+.shutterLine {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  z-index: 71;
+  background: $brand;
+  pointer-events: none;
+}
+
+// ---------- Intro leader ----------
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50.5%;
+  background: #0b0b0d;
+
+  &[data-pos='top'] {
+    top: 0;
+  }
+
+  &[data-pos='bottom'] {
+    bottom: 0;
+  }
+}
+
+.leader {
+  position: relative;
+  width: min(62vmin, 420px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  animation: flicker 0.25s steps(2) infinite;
+  color: $paper;
+}
+
+.cross {
+  position: absolute;
+  inset: -30%;
+  background:
+    linear-gradient(rgba($paper, 0.25), rgba($paper, 0.25)) center / 1px 100% no-repeat,
+    linear-gradient(rgba($paper, 0.25), rgba($paper, 0.25)) center / 100% 1px no-repeat;
+}
+
+.ringOuter,
+.ringInner {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba($paper, 0.75);
+}
+
+.ringOuter {
+  inset: 0;
+}
+
+.ringInner {
+  inset: 9%;
+  border-width: 1px;
+  border-color: rgba($paper, 0.4);
+}
+
+.sweep {
+  position: absolute;
+  inset: 9%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba($brand, 0.55) 0deg, rgba($brand, 0.08) 300deg, transparent 360deg);
+  mask: radial-gradient(circle, #000 69%, transparent 70%);
+  animation: sweep 0.52s linear forwards;
+}
+
+.num {
+  position: relative;
+  font-family: $font-display;
+  font-weight: 700;
+  font-size: min(38vmin, 260px);
+  line-height: 1;
+}
+
+.slate {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  @include eyebrow;
+  color: rgba($paper, 0.5);
+}

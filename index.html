@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#08080a" />
+    <meta name="description" content="Fairfilm: filmová a video produkce Praha. Reklamní spoty, firemní videa, filmový a televizní štáb, trikový ateliér a AI art." />
+    <!-- Fonts the first screen needs; the rest load on demand -->
+    <link rel="preload" href="/fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/barlow-condensed-latin-ext-700-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/media/video/hero-poster.webp" as="image" fetchpriority="high" />
+    <!-- Paint the brand background immediately, before any JS/CSS arrives -->
+    <style>html,body{background:#08080a;color:#f3efe8;margin:0}</style>
+    <title>Fairfilm | Videa, která pracují pro váš podnik</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

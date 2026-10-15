@@ -1,0 +1,131 @@
+// Injected into every SCSS file via vite.config.ts: variables, functions & mixins only (no CSS output).
+@use 'sass:map';
+@use 'sass:math';
+
+// ---------- Color ----------
+$ink: #08080a;
+$ink-2: #0f0f12;
+$ink-3: #17171b;
+$paper: #f3efe8;
+$paper-2: #e8e3da;
+$muted: #8f8a82;
+$brand: #ff6b00;
+$brand-2: #ff8a33;
+$line: rgba(255, 255, 255, 0.09);
+$line-strong: rgba(255, 255, 255, 0.18);
+
+// ---------- Type ----------
+$font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+$font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+$font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+// ---------- Motion ----------
+$ease-cine: cubic-bezier(0.7, 0, 0.2, 1);
+$ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+// ---------- Layout ----------
+$container: 1440px;
+$gutter: clamp(1rem, 4vw, 3.5rem);
+$header-h: 76px;
+
+$breakpoints: (
+  sm: 640px,
+  md: 860px,
+  lg: 1100px,
+  xl: 1320px,
+);
+
+@mixin up($bp) {
+  @media (min-width: map.get($breakpoints, $bp)) {
+    @content;
+  }
+}
+
+@mixin down($bp) {
+  @media (max-width: (map.get($breakpoints, $bp) - 1px)) {
+    @content;
+  }
+}
+
+@mixin hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @content;
+    }
+  }
+}
+
+@mixin container {
+  width: 100%;
+  max-width: $container;
+  margin-inline: auto;
+  padding-inline: $gutter;
+}
+
+@mixin display($size: clamp(3rem, 9vw, 9rem)) {
+  font-family: $font-display;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 0.88;
+  letter-spacing: -0.01em;
+  font-size: $size;
+}
+
+@mixin eyebrow {
+  font-family: $font-mono;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: $muted;
+}
+
+@mixin cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@mixin section-pad {
+  padding-block: clamp(5rem, 11vw, 10rem);
+}
+
+// Orange corner brackets: the "viewfinder" frame used on media
+@mixin frame-corners($size: 22px, $offset: -8px) {
+  position: relative;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: $size;
+    height: $size;
+    border-color: $brand;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  &::before {
+    top: $offset;
+    left: $offset;
+    border-top: 2px solid;
+    border-left: 2px solid;
+  }
+
+  &::after {
+    bottom: $offset;
+    right: $offset;
+    border-bottom: 2px solid;
+    border-right: 2px solid;
+  }
+}
+
+@mixin sprockets($color: rgba($paper, 0.2)) {
+  height: 10px;
+  background-image: repeating-linear-gradient(90deg, $color 0 14px, transparent 14px 30px);
+  border-radius: 2px;
+}
+
+@mixin fade-x($edge: 8%) {
+  mask-image: linear-gradient(90deg, transparent, #000 $edge, #000 (100% - $edge), transparent);
+}

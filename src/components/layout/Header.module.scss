@@ -1,0 +1,324 @@
+.header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  transition:
+    background-color 0.5s $ease-out,
+    border-color 0.5s $ease-out;
+  border-bottom: 1px solid transparent;
+}
+
+.solid {
+  background: rgba($ink, 0.94);
+  border-bottom-color: $line;
+}
+
+.bar {
+  @include container;
+  height: $header-h;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.logo {
+  flex: none;
+  position: relative;
+  z-index: 2;
+
+  img {
+    width: clamp(118px, 11vw, 150px);
+    height: auto;
+    transition: opacity 0.3s;
+  }
+
+  @include hover {
+    img {
+      opacity: 0.8;
+    }
+  }
+}
+
+.nav {
+  display: none;
+  margin-inline: auto;
+  gap: 0.4rem;
+
+  @include up(lg) {
+    display: flex;
+  }
+}
+
+.hasMega {
+  position: relative;
+}
+
+.link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.6rem 0.9rem;
+  font-family: $font-mono;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba($paper, 0.78);
+  transition: color 0.3s;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0.9rem;
+    right: 0.9rem;
+    bottom: 0.3rem;
+    height: 1px;
+    background: $brand;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s $ease-out;
+  }
+
+  @include hover {
+    color: $paper;
+    &::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+}
+
+.active {
+  color: $paper;
+
+  &::after {
+    transform: scaleX(1);
+  }
+}
+
+.chev {
+  transition: transform 0.4s $ease-out;
+}
+
+.chevOpen {
+  transform: rotate(180deg);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-left: auto;
+
+  @include up(lg) {
+    margin-left: 0;
+  }
+}
+
+.cta {
+  @include down(sm) {
+    display: none !important;
+  }
+}
+
+.burger {
+  position: relative;
+  z-index: 2;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid $line-strong;
+  display: grid;
+  place-content: center;
+  gap: 6px;
+
+  span {
+    display: block;
+    width: 18px;
+    height: 1.5px;
+    background: $paper;
+    transition: transform 0.5s $ease-out;
+  }
+
+  @include up(lg) {
+    display: none;
+  }
+}
+
+.burgerOpen span {
+  &:first-child {
+    transform: translateY(3.75px) rotate(45deg);
+  }
+  &:last-child {
+    transform: translateY(-3.75px) rotate(-45deg);
+  }
+}
+
+// ---------- Mega menu ----------
+.mega {
+  position: absolute;
+  inset: 100% 0 auto;
+  background: rgba($ink, 0.985);
+  border-bottom: 1px solid $line;
+}
+
+.megaInner {
+  @include container;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 3rem;
+  padding-block: 2rem 2.6rem;
+}
+
+.megaList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 2rem;
+}
+
+.megaLink {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid $line;
+  transition: color 0.3s;
+
+  @include hover {
+    .megaLabel {
+      color: $brand;
+      transform: translateX(6px);
+    }
+    .megaArrow {
+      opacity: 1;
+      transform: rotate(45deg);
+    }
+  }
+}
+
+.megaIdx {
+  grid-row: span 2;
+  font-family: $font-mono;
+  font-size: 0.7rem;
+  color: $brand;
+}
+
+.megaLabel {
+  font-family: $font-display;
+  font-size: 1.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  line-height: 1;
+  transition:
+    color 0.3s,
+    transform 0.5s $ease-out;
+}
+
+.megaNote {
+  grid-column: 2;
+  font-size: 0.8rem;
+  color: $muted;
+}
+
+.megaArrow {
+  grid-row: 1 / span 2;
+  grid-column: 3;
+  opacity: 0.3;
+  transition:
+    opacity 0.3s,
+    transform 0.5s $ease-out;
+}
+
+.megaFeature {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  min-height: 220px;
+  display: flex;
+  align-items: flex-end;
+  padding: 1.2rem;
+
+  video {
+    @include cover;
+    object-fit: cover;
+    filter: brightness(0.6);
+    transition:
+      transform 1.2s $ease-out,
+      filter 0.6s;
+  }
+
+  span {
+    position: relative;
+    font-family: $font-display;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  small {
+    display: block;
+    margin-bottom: 0.4rem;
+    @include eyebrow;
+    color: $brand;
+  }
+
+  @include hover {
+    video {
+      transform: scale(1.06);
+      filter: brightness(0.8);
+    }
+  }
+}
+
+// ---------- Mobile ----------
+.mobile {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: $ink;
+  display: flex;
+  flex-direction: column;
+  padding: calc($header-h + 1.5rem) $gutter 2rem;
+  overflow-y: auto;
+}
+
+.mobileNav {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.mobileLink {
+  @include display(clamp(2.6rem, 11vw, 4rem));
+  display: block;
+  padding-block: 0.1rem;
+
+  &.active {
+    color: $brand;
+  }
+}
+
+.mobileSub {
+  display: block;
+  padding: 0.35rem 0 0.35rem 1rem;
+  font-family: $font-mono;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba($paper, 0.65);
+  border-left: 1px solid $line-strong;
+
+  &.active {
+    color: $brand;
+    border-color: $brand;
+  }
+}
+
+.mobileFoot {
+  margin-top: auto;
+  padding-top: 2rem;
+  display: grid;
+  gap: 0.4rem;
+  color: rgba($paper, 0.7);
+}

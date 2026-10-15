@@ -1,0 +1,382 @@
+/* ---------------- Hero ---------------- */
+.hero {
+  position: relative;
+  height: 100svh;
+  min-height: 640px;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+}
+
+.heroMedia {
+  @include cover;
+  z-index: -2;
+
+  video {
+    @include cover;
+    object-fit: cover;
+  }
+}
+
+.heroShade {
+  @include cover;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba($ink, 0.55) 0%, rgba($ink, 0.1) 30%, rgba($ink, 0.35) 60%, $ink 100%),
+    linear-gradient(90deg, rgba($ink, 0.8) 0%, rgba($ink, 0.1) 70%),
+    radial-gradient(ellipse at center, transparent 50%, rgba($ink, 0.5));
+}
+
+.letterbox {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: $ink;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.lbTop {
+  top: 0;
+  transform-origin: top;
+  height: 22%;
+}
+
+.lbBottom {
+  bottom: 0;
+  transform-origin: bottom;
+  height: 22%;
+  @include down(md) {
+    display: none;
+  }
+}
+
+.heroInner {
+  @include container;
+  position: relative;
+  z-index: 1;
+  padding-bottom: clamp(5.5rem, 10vh, 8rem);
+}
+
+.heroEyebrow {
+  @include eyebrow;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: rgba($paper, 0.85);
+  margin-bottom: 1.6rem;
+}
+
+.heroTitle {
+  @include display(clamp(3.6rem, 12.5vw, 13.5rem));
+  line-height: 0.84;
+}
+
+.heroBottom {
+  display: grid;
+  gap: 2rem;
+  margin-top: clamp(2rem, 4vw, 3rem);
+
+  @include up(lg) {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+  }
+}
+
+.heroLead {
+  max-width: 30rem;
+  font-size: clamp(1.02rem, 1.4vw, 1.2rem);
+  color: rgba($paper, 0.8);
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+/* ---------------- 3D showcase placeholder (while the chunk loads) ---------------- */
+.showcasePlaceholder {
+  height: 520vh;
+
+  @include down(md) {
+    height: 420vh;
+  }
+}
+
+/* ---------------- Showreel ---------------- */
+.showreel {
+  @include section-pad;
+}
+
+.reelWrap {
+  overflow: visible;
+  transform-origin: center top;
+
+  > div {
+    border-radius: inherit;
+    overflow: hidden;
+  }
+}
+
+/* ---------------- Process ---------------- */
+.process {
+  @include section-pad;
+  padding-top: 0;
+}
+
+.steps {
+  display: grid;
+  gap: 2.5rem 2rem;
+
+  @include up(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include up(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.step {
+  display: grid;
+  align-content: start;
+  gap: 0.7rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid $line-strong;
+
+  h3 {
+    @include display(clamp(2rem, 3vw, 2.8rem));
+  }
+
+  p {
+    color: rgba($paper, 0.62);
+    font-size: 0.95rem;
+  }
+}
+
+.stepNum {
+  font-family: $font-mono;
+  font-size: 0.72rem;
+  color: $brand;
+}
+
+/* ---------------- Services ---------------- */
+.services {
+  @include section-pad;
+}
+
+.svcWrap {
+  position: relative;
+}
+
+.svcList {
+  border-top: 1px solid $line;
+}
+
+.svcRow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: clamp(1.3rem, 2.6vw, 2.2rem) 0;
+  border-bottom: 1px solid $line;
+  transition:
+    opacity 0.5s $ease-out,
+    color 0.4s;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba($brand, 0.12), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  @include up(md) {
+    grid-template-columns: 1fr 18rem auto;
+  }
+
+  @include hover {
+    &::before {
+      opacity: 1;
+    }
+    .svcTitle {
+      transform: translateX(1rem);
+      color: $brand;
+    }
+    .svcArrow {
+      transform: rotate(45deg);
+      color: $brand;
+    }
+  }
+}
+
+.svcDim {
+  opacity: 0.35;
+}
+
+.svcTitle {
+  @include display(clamp(2.1rem, 5.4vw, 5rem));
+  transition:
+    transform 0.6s $ease-out,
+    color 0.4s;
+}
+
+.svcNote {
+  display: none;
+  color: $muted;
+  font-size: 0.9rem;
+
+  @include up(md) {
+    display: block;
+  }
+}
+
+.svcArrow {
+  transition:
+    transform 0.6s $ease-out,
+    color 0.4s;
+}
+
+.preview {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: clamp(240px, 26vw, 400px);
+  aspect-ratio: 16 / 10;
+  margin: calc(clamp(240px, 26vw, 400px) * -0.3125) 0 0 calc(clamp(240px, 26vw, 400px) * -0.5);
+  border-radius: 14px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.9);
+  background: $ink-3;
+
+  @media (hover: none) {
+    display: none;
+  }
+}
+
+.previewVid {
+  @include cover;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+
+.previewOn {
+  opacity: 1;
+}
+
+/* ---------------- Clients ---------------- */
+.clients {
+  @include section-pad;
+  background: $paper;
+  color: $ink;
+  overflow: hidden;
+}
+
+/* ---------------- Divisions ---------------- */
+.divisions {
+  @include section-pad;
+  padding-top: clamp(3rem, 6vw, 5rem);
+}
+
+.divGrid {
+  display: grid;
+  gap: 1rem;
+
+  @include up(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include up(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.divWide {
+  @include up(md) {
+    grid-column: span 2;
+  }
+}
+
+.divCard {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: clamp(280px, 30vw, 400px);
+  height: 100%;
+  padding: 1.6rem;
+  overflow: hidden;
+  border-radius: 18px;
+  isolation: isolate;
+
+  img {
+    @include cover;
+    z-index: -2;
+    object-fit: cover;
+    transform: scale(1.02);
+    filter: grayscale(0.35) brightness(0.75);
+    transition:
+      transform 1.4s $ease-out,
+      filter 0.8s;
+  }
+
+  @include hover {
+    img {
+      transform: scale(1.09);
+      filter: none;
+    }
+    .divArrow {
+      background: $brand;
+      color: $ink;
+      transform: rotate(45deg);
+    }
+    .divShade {
+      opacity: 0.75;
+    }
+  }
+}
+
+.divShade {
+  @include cover;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent 30%, rgba($ink, 0.92));
+  transition: opacity 0.6s;
+}
+
+.divBody {
+  display: grid;
+  gap: 0.3rem;
+
+  strong {
+    @include display(clamp(2rem, 3.4vw, 3.2rem));
+  }
+
+  small {
+    color: rgba($paper, 0.75);
+    font-size: 0.9rem;
+  }
+}
+
+.divArrow {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  display: grid;
+  place-items: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  background: rgba($ink, 0.6);
+  transition:
+    background 0.4s,
+    color 0.4s,
+    transform 0.6s $ease-out;
+}

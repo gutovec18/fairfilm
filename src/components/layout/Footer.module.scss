@@ -1,0 +1,110 @@
+.footer {
+  position: relative;
+  border-top: 1px solid $line;
+  background: $ink;
+  overflow: hidden;
+}
+
+.inner {
+  @include container;
+  display: grid;
+  gap: 3rem;
+  padding-block: clamp(3.5rem, 7vw, 6rem);
+
+  @include up(md) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @include up(lg) {
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  }
+}
+
+.brand {
+  display: grid;
+  align-content: start;
+  gap: 1.4rem;
+  max-width: 24rem;
+
+  img {
+    width: 170px;
+    height: auto;
+  }
+
+  p {
+    color: rgba($paper, 0.65);
+    font-size: 0.95rem;
+  }
+}
+
+.intl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  @include eyebrow;
+  color: $brand;
+
+  @include hover {
+    color: $paper;
+  }
+}
+
+.col {
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+  font-size: 0.95rem;
+  color: rgba($paper, 0.7);
+
+  h3 {
+    @include eyebrow;
+    margin-bottom: 0.6rem;
+    color: $paper;
+  }
+
+  a {
+    width: fit-content;
+    transition: color 0.3s;
+
+    @include hover {
+      color: $brand;
+    }
+  }
+}
+
+.mt {
+  margin-top: 1.8rem;
+}
+
+.strong {
+  font-family: $font-display;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: $paper;
+  line-height: 1.15;
+}
+
+.legal {
+  @include container;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-block: 1.6rem 2rem;
+  border-top: 1px solid $line;
+  font-size: 0.78rem;
+  color: $muted;
+}
+
+.top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  @include eyebrow;
+  color: $paper;
+
+  @include hover {
+    color: $brand;
+  }
+}

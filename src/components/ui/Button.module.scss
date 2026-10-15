@@ -1,0 +1,105 @@
+.btn {
+  --bg: #{$brand};
+  --fg: #{$ink};
+  --icon-bg: #{$ink};
+  --icon-fg: #{$brand};
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.5rem 0.5rem 0.5rem 1.4rem;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: $font-mono;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    background-color 0.4s $ease-out,
+    color 0.4s $ease-out,
+    transform 0.4s $ease-out;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  @include hover {
+    .label span {
+      transform: translateY(-100%);
+    }
+    .icon {
+      transform: rotate(45deg);
+    }
+  }
+}
+
+.label {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  height: 1.3em;
+  line-height: 1.3em;
+
+  span {
+    display: inline-block;
+    transition: transform 0.55s $ease-out;
+
+    // Rolling-text hover: duplicate label slides up from below
+    &[data-text]::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 100%;
+    }
+  }
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: var(--icon-bg);
+  color: var(--icon-fg);
+  transition: transform 0.55s $ease-out;
+}
+
+.primary {
+  @include hover {
+    --bg: #{$paper};
+  }
+}
+
+.ghost {
+  --bg: transparent;
+  --fg: #{$paper};
+  --icon-bg: #{rgba($paper, 0.1)};
+  --icon-fg: #{$paper};
+  box-shadow: inset 0 0 0 1px $line-strong;
+
+  @include hover {
+    --bg: #{$paper};
+    --fg: #{$ink};
+    --icon-bg: #{$ink};
+    --icon-fg: #{$paper};
+  }
+}
+
+.dark {
+  --bg: #{$ink};
+  --fg: #{$paper};
+  --icon-bg: #{$brand};
+  --icon-fg: #{$ink};
+
+  @include hover {
+    --bg: #{$brand};
+    --fg: #{$ink};
+    --icon-bg: #{$ink};
+    --icon-fg: #{$brand};
+  }
+}

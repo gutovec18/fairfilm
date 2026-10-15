@@ -1,0 +1,50 @@
+.head {
+  display: grid;
+  gap: 2rem;
+  margin-bottom: clamp(3rem, 6vw, 5.5rem);
+}
+
+.split {
+  @include up(lg) {
+    grid-template-columns: 1.4fr 1fr;
+    align-items: end;
+    gap: 4rem;
+  }
+}
+
+.stack {
+  max-width: 62rem;
+}
+
+.eyebrow {
+  @include eyebrow;
+  color: $brand;
+  margin-bottom: 1.4rem;
+}
+
+.title {
+  @include display(clamp(2.8rem, 7vw, 6.5rem));
+}
+
+.intro {
+  max-width: 34rem;
+  color: rgba($paper, 0.72);
+  font-size: clamp(1rem, 1.2vw, 1.12rem);
+  line-height: 1.7;
+
+  p + p {
+    margin-top: 1rem;
+  }
+}
+
+.light {
+  color: $ink;
+
+  .eyebrow {
+    color: rgba($ink, 0.55);
+  }
+
+  .intro {
+    color: rgba($ink, 0.7);
+  }
+}

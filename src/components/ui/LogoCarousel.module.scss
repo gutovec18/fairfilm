@@ -1,0 +1,82 @@
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.carousel {
+  display: grid;
+  gap: clamp(0.75rem, 1.6vw, 1.25rem);
+}
+
+.row {
+  overflow: hidden;
+  @include fade-x(10%);
+
+  &:hover .track {
+    animation-play-state: paused;
+  }
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  gap: clamp(0.75rem, 1.6vw, 1.25rem);
+  animation: marquee 70s linear infinite;
+  will-change: transform;
+}
+
+.reverse {
+  animation-direction: reverse;
+}
+
+// stop animating while scrolled out of view
+.paused .track {
+  animation-play-state: paused;
+}
+
+.item {
+  flex: none;
+  width: clamp(150px, 15vw, 210px);
+  height: clamp(84px, 8vw, 108px);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    0 1px 0 rgba($ink, 0.04),
+    0 10px 30px -18px rgba($ink, 0.35);
+  transition:
+    transform 0.5s $ease-out,
+    box-shadow 0.5s $ease-out;
+
+  img {
+    max-width: 100%;
+    max-height: 52px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    user-select: none;
+  }
+
+  @include hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 1px 0 rgba($ink, 0.04),
+      0 22px 40px -20px rgba($ink, 0.45);
+  }
+}
+
+.link {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 1rem 1.4rem;
+  border-radius: inherit;
+
+  &:focus-visible {
+    outline-offset: -3px;
+  }
+}

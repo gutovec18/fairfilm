@@ -1,0 +1,550 @@
+// Shared building blocks for the sub-pages.
+
+.section {
+  @include section-pad;
+}
+
+.tight {
+  padding-top: 0;
+}
+
+.alt {
+  background: $ink-2;
+  border-block: 1px solid $line;
+}
+
+.light {
+  background: $paper;
+  color: $ink;
+}
+
+/* ---------- Intro: big statement + body copy ---------- */
+.intro {
+  display: grid;
+  gap: 2.5rem;
+
+  @include up(lg) {
+    grid-template-columns: 1.3fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+}
+
+.statement {
+  font-family: $font-display;
+  font-weight: 600;
+  font-size: clamp(1.9rem, 3.6vw, 3.4rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+
+  em {
+    font-style: normal;
+    color: $brand;
+  }
+}
+
+.body {
+  display: grid;
+  gap: 1.1rem;
+  color: rgba($paper, 0.72);
+  font-size: 1.05rem;
+  line-height: 1.75;
+
+  strong {
+    color: $paper;
+    font-weight: 500;
+  }
+
+  .light & {
+    color: rgba($ink, 0.72);
+  }
+}
+
+/* ---------- Tags / pills ---------- */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 2.5rem;
+}
+
+.tag {
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  border: 1px solid $line-strong;
+  font-size: 0.85rem;
+  color: rgba($paper, 0.8);
+  transition:
+    background 0.3s,
+    color 0.3s,
+    border-color 0.3s;
+
+  @include hover {
+    background: $brand;
+    border-color: $brand;
+    color: $ink;
+  }
+}
+
+/* ---------- Cards ---------- */
+.grid2,
+.grid3,
+.grid4 {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid2 {
+  @include up(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.grid3 {
+  @include up(md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include up(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.grid4 {
+  grid-template-columns: repeat(2, 1fr);
+  @include up(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  padding: clamp(1.4rem, 2.4vw, 2.2rem);
+  border-radius: 20px;
+  background: $ink-3;
+  border: 1px solid $line;
+  transition:
+    border-color 0.4s,
+    transform 0.6s $ease-out;
+
+  h3 {
+    font-family: $font-display;
+    font-size: clamp(1.7rem, 2.4vw, 2.3rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  p {
+    color: rgba($paper, 0.68);
+  }
+
+  @include hover {
+    border-color: rgba($brand, 0.55);
+    transform: translateY(-4px);
+  }
+}
+
+.cardIdx {
+  @include eyebrow;
+  color: $brand;
+}
+
+.featured {
+  border-color: rgba($brand, 0.6);
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba($brand, 0.16), transparent 60%),
+    $ink-3;
+}
+
+.badge {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: $brand;
+  color: $ink;
+  font-family: $font-mono;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---------- Gear card: product shot on a light plate ---------- */
+.gear {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+  border-radius: 20px;
+  background: $ink-3;
+  border: 1px solid $line;
+  transition: border-color 0.4s;
+
+  @include hover {
+    border-color: rgba($brand, 0.55);
+
+    .gearShot img {
+      transform: scale(1.06) rotate(-1deg);
+    }
+  }
+}
+
+.gearShot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  padding: 1.5rem;
+  background: radial-gradient(circle at 50% 60%, #ffffff, $paper-2 75%);
+  overflow: hidden;
+
+  img {
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
+    transition: transform 1s $ease-out;
+    // Several source shots have opaque white backgrounds: multiply melts them into the plate
+    mix-blend-mode: multiply;
+  }
+
+  span {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    font-family: $font-mono;
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba($ink, 0.5);
+  }
+}
+
+.gearBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: clamp(1.4rem, 2.4vw, 2rem);
+  flex: 1;
+
+  h3 {
+    font-family: $font-display;
+    font-size: clamp(1.7rem, 2.4vw, 2.3rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  > p {
+    color: rgba($paper, 0.68);
+  }
+}
+
+/* ---------- Spec list ---------- */
+.specs {
+  display: grid;
+  border-top: 1px solid $line;
+
+  > div {
+    display: grid;
+    grid-template-columns: minmax(7rem, 38%) 1fr;
+    gap: 1rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid $line;
+    font-size: 0.92rem;
+  }
+
+  dt {
+    @include eyebrow;
+    font-size: 0.66rem;
+    padding-top: 0.2rem;
+  }
+
+  dd {
+    margin: 0;
+    color: rgba($paper, 0.85);
+  }
+}
+
+/* ---------- Check list ---------- */
+.checks {
+  display: grid;
+  gap: 0.8rem;
+
+  li {
+    position: relative;
+    padding-left: 1.8rem;
+    color: rgba($paper, 0.8);
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.72em;
+      width: 0.9rem;
+      height: 1px;
+      background: $brand;
+    }
+  }
+
+  .light & li {
+    color: rgba($ink, 0.8);
+  }
+}
+
+/* ---------- Price ---------- */
+.price {
+  margin-top: auto;
+  padding-top: 1.2rem;
+  border-top: 1px dashed $line-strong;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+
+  strong {
+    font-family: $font-display;
+    font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+    font-weight: 700;
+    color: $brand;
+    line-height: 1;
+  }
+
+  span {
+    @include eyebrow;
+    font-size: 0.64rem;
+  }
+}
+
+/* ---------- Numbered steps (timeline) ---------- */
+.timeline {
+  position: relative;
+  display: grid;
+  gap: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 1.6rem;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: $line-strong;
+
+    @include up(md) {
+      left: 2.4rem;
+    }
+  }
+}
+
+.tlItem {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3.2rem 1fr;
+  gap: 1.2rem;
+  padding-block: 1.8rem;
+
+  @include up(md) {
+    grid-template-columns: 4.8rem 1fr 1.2fr;
+    gap: 2rem;
+  }
+
+  h3 {
+    font-family: $font-display;
+    font-size: clamp(1.7rem, 2.6vw, 2.4rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  p {
+    grid-column: 2;
+    color: rgba($paper, 0.7);
+
+    @include up(md) {
+      grid-column: 3;
+      grid-row: 1;
+    }
+  }
+}
+
+.tlNum {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  background: $ink;
+  border: 1px solid $brand;
+  font-family: $font-mono;
+  font-size: 0.8rem;
+  color: $brand;
+
+  @include up(md) {
+    width: 4.8rem;
+    height: 4.8rem;
+    font-size: 1rem;
+  }
+}
+
+/* ---------- Media ---------- */
+.mediaFrame {
+  border-radius: 6px;
+  overflow: hidden;
+
+  img,
+  video {
+    width: 100%;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+}
+
+.imgCard {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  aspect-ratio: 16 / 10;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  padding: 1.2rem;
+
+  img {
+    @include cover;
+    z-index: -2;
+    object-fit: cover;
+    filter: grayscale(0.3) brightness(0.85);
+    transition:
+      transform 1.4s $ease-out,
+      filter 0.6s;
+  }
+
+  &::after {
+    content: '';
+    @include cover;
+    z-index: -1;
+    background: linear-gradient(180deg, transparent 40%, rgba($ink, 0.88));
+  }
+
+  span {
+    font-family: $font-display;
+    font-size: clamp(1.3rem, 1.8vw, 1.7rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  @include hover {
+    img {
+      transform: scale(1.08);
+      filter: none;
+    }
+  }
+}
+
+/* ---------- Big quote ---------- */
+.quote {
+  position: relative;
+  max-width: 62rem;
+  font-family: $font-display;
+  font-weight: 500;
+  font-size: clamp(1.8rem, 3.6vw, 3.2rem);
+  line-height: 1.12;
+  text-transform: uppercase;
+
+  &::before {
+    content: '“';
+    position: absolute;
+    left: -0.1em;
+    top: -0.55em;
+    font-size: 3em;
+    color: $brand;
+    opacity: 0.4;
+    line-height: 1;
+  }
+
+  footer {
+    margin-top: 1.6rem;
+    @include eyebrow;
+    color: $brand;
+  }
+}
+
+/* ---------- Key facts strip ---------- */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-top: 1px solid $line;
+  border-left: 1px solid $line;
+
+  @include up(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  > div {
+    padding: 1.6rem;
+    border-right: 1px solid $line;
+    border-bottom: 1px solid $line;
+  }
+
+  strong {
+    display: block;
+    font-family: $font-display;
+    font-size: clamp(2.4rem, 4.4vw, 4rem);
+    font-weight: 700;
+    line-height: 0.95;
+    color: $brand;
+  }
+
+  span {
+    font-size: 0.88rem;
+    color: rgba($paper, 0.65);
+  }
+}
+
+.note {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  color: $muted;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+}
+
+.split {
+  display: grid;
+  gap: 3rem;
+  align-items: center;
+
+  @include up(lg) {
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+  }
+}
+
+.splitReverse {
+  @include up(lg) {
+    > :first-child {
+      order: 2;
+    }
+  }
+}
+
+.h3 {
+  font-family: $font-display;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 1.5rem;
+}
